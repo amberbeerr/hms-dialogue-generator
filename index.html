@@ -435,28 +435,31 @@ function drawBg() {
   }
 }
 
-function drawBrand() {
-  ctx.save();
-  ctx.fillStyle='rgba(255,255,255,0.8)';
-  ctx.font='700 10px "Helvetica Neue",sans-serif';
-  ctx.letterSpacing='0.22em';
-  ctx.textAlign='center';
-  ctx.fillText('HUMAN SPACE', cv.width/2, 36);
-  ctx.restore();
-}
-
 function drawTitle() {
   const l1 = document.getElementById('titleLine1').value.trim();
   const l2 = document.getElementById('titleLine2').value.trim();
   if (!l1 && !l2) return;
+
+  // Source image 1080×1920, title zone y400–600 → canvas scale 360/1080
+  // y400*scale=133, y600*scale=200 → center=167
+  const TITLE_TOP    = Math.round(400 * SCALE); // 133
+  const TITLE_BOTTOM = Math.round(600 * SCALE); // 200
+  const TITLE_CENTER = Math.round((TITLE_TOP + TITLE_BOTTOM) / 2); // 167
+
+  const fsize = 16;
+  const lh = fsize + 6;
+  const lineCount = (l1 ? 1 : 0) + (l2 ? 1 : 0);
+  const totalH = lineCount * lh;
+  let y = TITLE_CENTER - totalH / 2 + fsize;
+
   ctx.save();
-  ctx.textAlign='center';
-  ctx.fillStyle='rgba(255,255,255,0.9)';
-  ctx.font='300 15px "PingFang TC","Helvetica Neue",sans-serif';
-  ctx.letterSpacing='0.01em';
-  let y = 58;
-  if(l1){ctx.fillText(l1,cv.width/2,y);y+=20;}
-  if(l2){ctx.fillText(l2,cv.width/2,y);}
+  ctx.textAlign = 'center';
+  ctx.fillStyle = '#ffffff';
+  // Bold black font for clarity
+  ctx.font = `600 ${fsize}px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif`;
+  ctx.letterSpacing = '0.02em';
+  if (l1) { ctx.fillText(l1, cv.width/2, y); y += lh; }
+  if (l2) { ctx.fillText(l2, cv.width/2, y); }
   ctx.restore();
 }
 
@@ -480,9 +483,9 @@ function drawSideText(side, text, alpha, showCursor) {
   if (!text || alpha <= 0) return;
   const isA = side === 'A';
   const xCenter = isA ? A_X : B_X;
-  const font = '300 13px "PingFang TC","Helvetica Neue",sans-serif';
+  const font = '700 14px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif';
   const maxW = TEXT_MAX_W;
-  const lh = 17;
+  const lh = 20;
 
   const lines = wrapText(text, maxW, font);
   const totalH = lines.length * lh;
@@ -493,7 +496,7 @@ function drawSideText(side, text, alpha, showCursor) {
   ctx.globalAlpha = alpha;
   ctx.fillStyle = '#ffffff';
   ctx.font = font;
-  ctx.letterSpacing = '0.01em';
+  ctx.letterSpacing = '0.02em';
   ctx.textAlign = 'center';
 
   lines.forEach((line, i) => {
@@ -515,7 +518,6 @@ function drawSideText(side, text, alpha, showCursor) {
 function renderAt(t) {
   ctx.clearRect(0,0,cv.width,cv.height);
   drawBg();
-  drawBrand();
   drawTitle();
 
   // For each side, find the segment active at time t
@@ -567,7 +569,6 @@ function renderAt(t) {
 function drawStatic() {
   ctx.clearRect(0,0,cv.width,cv.height);
   drawBg();
-  drawBrand();
   drawTitle();
   if (!bgs[activeBg]) {
     ctx.fillStyle='#252525';ctx.font='11px Helvetica';
