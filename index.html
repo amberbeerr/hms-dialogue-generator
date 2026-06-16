@@ -3,10 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>HMS · Dialogue Video Generator</title>
+<title>HMS · Dialogue Generator</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
-
 body {
   background:#080808;
   color:#d8d8d8;
@@ -16,358 +15,132 @@ body {
   overflow:hidden;
 }
 
-/* ═══ LEFT PANEL ═══ */
+/* ═══ LEFT ═══ */
 .left {
-  width:400px;
-  min-width:400px;
+  width:380px;
+  min-width:380px;
   background:#0f0f0f;
   border-right:1px solid #1c1c1c;
   display:flex;
   flex-direction:column;
   height:100vh;
 }
-
 .left-header {
-  padding:24px 24px 18px;
+  padding:22px 22px 16px;
   border-bottom:1px solid #1a1a1a;
   flex-shrink:0;
 }
-.brand-label {
-  font-size:9px;
-  letter-spacing:0.25em;
-  text-transform:uppercase;
-  color:#444;
-  margin-bottom:5px;
-}
-.tool-title {
-  font-size:17px;
-  font-weight:300;
-  color:#bbb;
-  letter-spacing:0.04em;
-}
+.brand-label { font-size:9px;letter-spacing:0.25em;text-transform:uppercase;color:#444;margin-bottom:4px; }
+.tool-title { font-size:16px;font-weight:300;color:#bbb;letter-spacing:0.04em; }
 
-.left-body {
-  flex:1;
-  overflow-y:auto;
-  padding:0 0 16px;
-}
+.left-body { flex:1;overflow-y:auto;padding:0 0 8px; }
 
-/* Sections */
-.sec {
-  padding:16px 24px;
-  border-bottom:1px solid #161616;
-}
-.sec-label {
-  font-size:9px;
-  letter-spacing:0.2em;
-  text-transform:uppercase;
-  color:#3a3a3a;
-  margin-bottom:10px;
-}
+.sec { padding:14px 22px;border-bottom:1px solid #141414; }
+.sec-label { font-size:9px;letter-spacing:0.2em;text-transform:uppercase;color:#383838;margin-bottom:9px; }
 
-/* Upload grid */
-.bg-grid {
-  display:grid;
-  grid-template-columns:1fr 1fr;
-  gap:8px;
-}
+/* BG upload */
+.bg-grid { display:grid;grid-template-columns:1fr 1fr;gap:6px; }
 .bg-slot {
-  aspect-ratio:9/12;
-  border:1px dashed #252525;
+  aspect-ratio:9/16;
+  border:1px dashed #222;
   border-radius:3px;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  cursor:pointer;
-  position:relative;
-  overflow:hidden;
+  display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  cursor:pointer;position:relative;overflow:hidden;
   transition:border-color 0.2s;
 }
 .bg-slot:hover { border-color:#444; }
-.bg-slot input { position:absolute;inset:0;opacity:0;cursor:pointer; }
-.bg-slot img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:2px; }
-.bg-slot-label {
-  font-size:9px;
-  color:#333;
-  letter-spacing:0.1em;
-  text-transform:uppercase;
-  z-index:1;
-  text-shadow:0 1px 3px #000;
-}
-.bg-slot .slot-num {
-  font-size:18px;
-  color:#252525;
-  margin-bottom:4px;
-}
-.bg-slot.filled .bg-slot-label { color:#aaa; }
+.bg-slot input { position:absolute;inset:0;opacity:0;cursor:pointer;z-index:3; }
+.bg-slot img { position:absolute;inset:0;width:100%;height:100%;object-fit:cover;border-radius:2px;z-index:1; }
+.bg-slot-label { font-size:9px;color:#2e2e2e;letter-spacing:0.1em;text-transform:uppercase;z-index:2; }
+.bg-slot .slot-num { font-size:16px;color:#222;margin-bottom:3px;z-index:2; }
+.bg-slot.filled .bg-slot-label { color:rgba(255,255,255,0.7);text-shadow:0 1px 3px #000; }
 .bg-slot .remove-bg {
-  position:absolute;top:4px;right:4px;
-  background:rgba(0,0,0,0.7);
-  border:none;color:#888;
-  width:18px;height:18px;
-  border-radius:50%;
-  font-size:10px;cursor:pointer;
-  display:none;
-  align-items:center;justify-content:center;
-  z-index:2;
+  position:absolute;top:4px;right:4px;z-index:4;
+  background:rgba(0,0,0,0.75);border:none;color:#aaa;
+  width:18px;height:18px;border-radius:50%;font-size:11px;
+  cursor:pointer;display:none;align-items:center;justify-content:center;
 }
 .bg-slot.filled .remove-bg { display:flex; }
 
-/* Text inputs */
+/* Inputs */
 input[type=text], textarea, select {
-  width:100%;
-  background:#090909;
-  border:1px solid #222;
-  border-radius:2px;
-  color:#ccc;
-  font-family:inherit;
-  font-size:13px;
-  padding:9px 11px;
-  outline:none;
+  width:100%;background:#090909;border:1px solid #1e1e1e;border-radius:2px;
+  color:#ccc;font-family:inherit;font-size:13px;padding:8px 10px;outline:none;
   transition:border-color 0.2s;
 }
-input[type=text]:focus, textarea:focus { border-color:#444; }
-textarea { resize:vertical; line-height:1.5; }
+input[type=text]:focus, textarea:focus { border-color:#3a3a3a; }
+textarea { resize:vertical;line-height:1.6; }
+.gap6 { margin-bottom:6px; }
 
-.input-gap { margin-bottom:6px; }
+/* Dialogue textarea */
+.dialogue-input { min-height:200px;font-size:12px;line-height:1.7; }
+.hint { font-size:10px;color:#333;margin-top:6px;line-height:1.6; }
 
-/* Language toggle */
-.lang-toggle {
-  display:flex;
-  gap:6px;
-  margin-bottom:10px;
-}
-.lang-btn {
-  flex:1;
-  padding:7px 0;
-  background:#0d0d0d;
-  border:1px solid #222;
-  border-radius:2px;
-  color:#555;
-  font-size:10px;
-  letter-spacing:0.15em;
-  text-transform:uppercase;
-  cursor:pointer;
-  font-family:inherit;
-  transition:all 0.15s;
-}
-.lang-btn.active { background:#1e1e1e; border-color:#555; color:#ccc; }
-
-/* Dialogue lines */
-.dialogue-list { display:flex; flex-direction:column; gap:6px; }
-
-.d-line {
-  background:#0c0c0c;
-  border:1px solid #1e1e1e;
-  border-radius:3px;
-  overflow:hidden;
-}
-.d-line-header {
-  display:flex;
-  align-items:center;
-  gap:8px;
-  padding:7px 10px;
-  border-bottom:1px solid #181818;
-}
-.sp-toggle {
-  display:flex;
-  border:1px solid #222;
-  border-radius:2px;
-  overflow:hidden;
-}
-.sp-btn {
-  padding:3px 10px;
-  font-size:9px;
-  letter-spacing:0.15em;
-  text-transform:uppercase;
-  background:none;
-  border:none;
-  color:#444;
-  cursor:pointer;
-  font-family:inherit;
-  transition:all 0.15s;
-}
-.sp-btn.on { background:#1e1e1e; color:#bbb; }
-.d-line-num {
-  font-size:9px;
-  color:#2e2e2e;
-  margin-left:auto;
-  letter-spacing:0.1em;
-}
-.del-line {
-  background:none;border:none;color:#2e2e2e;
-  cursor:pointer;font-size:13px;padding:0 2px;
-  transition:color 0.15s;
-}
-.del-line:hover { color:#777; }
-
-.d-line-body { padding:8px 10px; }
-.d-line-body textarea {
-  min-height:48px;
-  font-size:13px;
-  margin-bottom:0;
-}
-
-.add-btn {
-  width:100%;
-  padding:9px;
-  background:none;
-  border:1px dashed #1e1e1e;
-  border-radius:2px;
-  color:#3a3a3a;
-  font-size:10px;
-  letter-spacing:0.12em;
-  text-transform:uppercase;
-  cursor:pointer;
-  font-family:inherit;
-  transition:all 0.2s;
-  margin-top:8px;
-}
-.add-btn:hover { border-color:#3a3a3a; color:#666; }
-
-/* Timing controls */
-.timing-row {
-  display:flex;
-  align-items:center;
-  justify-content:space-between;
-  margin-bottom:10px;
-}
+/* Timing */
+.timing-row { display:flex;align-items:center;justify-content:space-between;margin-bottom:8px; }
 .timing-row:last-child { margin-bottom:0; }
-.timing-label { font-size:11px; color:#555; }
-.timing-right { display:flex; align-items:center; gap:8px; }
-input[type=range] {
-  width:100px;background:none;border:none;padding:0;
-  accent-color:#666;cursor:pointer;
-}
-.timing-val { font-size:10px; color:#444; min-width:36px; text-align:right; }
+.timing-label { font-size:11px;color:#4a4a4a; }
+.timing-right { display:flex;align-items:center;gap:6px; }
+input[type=range] { width:90px;background:none;border:none;padding:0;accent-color:#666;cursor:pointer; }
+.timing-val { font-size:10px;color:#3a3a3a;min-width:34px;text-align:right; }
 
-/* Actions */
-.left-footer {
-  padding:16px 24px;
-  border-top:1px solid #181818;
-  display:flex;
-  flex-direction:column;
-  gap:8px;
-  flex-shrink:0;
-}
-
+/* Footer */
+.left-footer { padding:14px 22px;border-top:1px solid #181818;flex-shrink:0;display:flex;flex-direction:column;gap:7px; }
 .gen-btn {
-  width:100%;
-  padding:13px;
-  background:#d8d8d8;
-  color:#080808;
-  border:none;
-  border-radius:2px;
-  font-size:10px;
-  letter-spacing:0.18em;
-  text-transform:uppercase;
-  cursor:pointer;
-  font-family:inherit;
-  font-weight:600;
+  width:100%;padding:12px;background:#d8d8d8;color:#080808;
+  border:none;border-radius:2px;font-size:10px;letter-spacing:0.18em;
+  text-transform:uppercase;cursor:pointer;font-family:inherit;font-weight:600;
   transition:background 0.15s;
 }
 .gen-btn:hover { background:#fff; }
-.gen-btn:disabled { background:#222; color:#444; cursor:not-allowed; }
+.export-btn {
+  width:100%;padding:9px;background:none;border:1px solid #1e1e1e;border-radius:2px;
+  color:#444;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;
+  cursor:pointer;font-family:inherit;transition:all 0.2s;
+}
+.export-btn:hover:not(:disabled) { border-color:#444;color:#888; }
+.export-btn:disabled { opacity:0.3;cursor:not-allowed; }
+.status { font-size:10px;color:#3a3a3a;letter-spacing:0.04em;text-align:center;min-height:13px; }
 
-.status { font-size:10px; color:#444; letter-spacing:0.05em; text-align:center; min-height:14px; }
-
-/* ═══ RIGHT PANEL ═══ */
+/* ═══ RIGHT ═══ */
 .right {
-  flex:1;
-  display:flex;
-  flex-direction:column;
-  align-items:center;
-  justify-content:center;
-  gap:20px;
-  padding:32px;
-  overflow:hidden;
+  flex:1;display:flex;flex-direction:column;
+  align-items:center;justify-content:center;
+  gap:16px;padding:28px;overflow:hidden;
 }
 
-.canvas-wrap {
-  position:relative;
-  flex-shrink:0;
-}
-
-canvas {
-  display:block;
-  border-radius:3px;
-  box-shadow:0 8px 80px rgba(0,0,0,0.9);
-}
-
-/* BG selector chips */
-.bg-chips {
-  display:flex;
-  gap:8px;
-}
+.bg-chips { display:flex;gap:6px; }
 .bg-chip {
-  width:36px;
-  height:52px;
-  border-radius:2px;
-  overflow:hidden;
-  cursor:pointer;
-  border:2px solid transparent;
-  transition:border-color 0.15s;
-  background:#1a1a1a;
-  display:flex;align-items:center;justify-content:center;
-  font-size:9px;color:#333;letter-spacing:0.1em;
+  width:30px;height:48px;border-radius:2px;overflow:hidden;
+  cursor:pointer;border:2px solid transparent;transition:border-color 0.15s;
+  background:#1a1a1a;display:flex;align-items:center;justify-content:center;
+  font-size:9px;color:#2a2a2a;
 }
 .bg-chip.active { border-color:#888; }
 .bg-chip img { width:100%;height:100%;object-fit:cover; }
 
-/* Playback */
+canvas {
+  display:block;border-radius:3px;
+  box-shadow:0 8px 60px rgba(0,0,0,0.85);
+}
+
 .playback {
-  display:flex;
-  align-items:center;
-  gap:12px;
-  background:#0f0f0f;
-  border:1px solid #1e1e1e;
-  border-radius:3px;
-  padding:10px 16px;
-  width:100%;
-  max-width:320px;
+  display:flex;align-items:center;gap:10px;
+  background:#0f0f0f;border:1px solid #1a1a1a;border-radius:3px;
+  padding:8px 14px;width:100%;max-width:300px;
 }
 .play-pause {
-  width:32px;height:32px;
-  background:#d8d8d8;
-  border:none;border-radius:50%;
-  cursor:pointer;
-  display:flex;align-items:center;justify-content:center;
-  flex-shrink:0;
-  transition:background 0.15s;
+  width:30px;height:30px;background:#d8d8d8;border:none;border-radius:50%;
+  cursor:pointer;display:flex;align-items:center;justify-content:center;
+  flex-shrink:0;transition:background 0.15s;
 }
 .play-pause:hover { background:#fff; }
-.play-pause svg { width:12px;height:12px;fill:#080808; }
+.play-pause svg { width:11px;height:11px;fill:#080808; }
+.track { flex:1;height:2px;background:#1a1a1a;border-radius:1px;cursor:pointer;position:relative; }
+.track-fill { height:100%;background:#555;border-radius:1px;pointer-events:none; }
+.time { font-size:10px;color:#333;min-width:52px;text-align:right;font-variant-numeric:tabular-nums; }
 
-.track {
-  flex:1;height:2px;background:#1e1e1e;
-  border-radius:1px;cursor:pointer;position:relative;
-}
-.track-fill {
-  height:100%;background:#666;border-radius:1px;
-  pointer-events:none;
-  transition:width 0.08s linear;
-}
-
-.time { font-size:10px; color:#3a3a3a; min-width:56px; text-align:right; font-variant-numeric:tabular-nums; }
-
-.export-btn {
-  padding:8px 24px;
-  background:none;
-  border:1px solid #222;
-  border-radius:2px;
-  color:#555;
-  font-size:9px;
-  letter-spacing:0.15em;
-  text-transform:uppercase;
-  cursor:pointer;
-  font-family:inherit;
-  transition:all 0.2s;
-}
-.export-btn:hover:not(:disabled) { border-color:#555;color:#aaa; }
-.export-btn:disabled { opacity:0.3;cursor:not-allowed; }
-
-/* Scrollbar */
 ::-webkit-scrollbar { width:3px; }
 ::-webkit-scrollbar-track { background:#080808; }
 ::-webkit-scrollbar-thumb { background:#1e1e1e;border-radius:2px; }
@@ -375,7 +148,7 @@ canvas {
 </head>
 <body>
 
-<!-- ═══ LEFT ═══ -->
+<!-- LEFT -->
 <div class="left">
   <div class="left-header">
     <div class="brand-label">Human Space</div>
@@ -384,42 +157,32 @@ canvas {
 
   <div class="left-body">
 
-    <!-- BG Images -->
     <div class="sec">
       <div class="sec-label">Background Images (up to 4)</div>
-      <div class="bg-grid" id="bgGrid">
-        <!-- slots injected by JS -->
-      </div>
+      <div class="bg-grid" id="bgGrid"></div>
     </div>
 
-    <!-- Title -->
     <div class="sec">
       <div class="sec-label">Fixed Title</div>
-      <input type="text" id="titleLine1" placeholder="Line 1 — 有愛就夠了嗎？" class="input-gap">
-      <input type="text" id="titleLine2" placeholder="Line 2 — 還是習慣與價值觀更重要？">
+      <input type="text" id="titleLine1" placeholder="第一行標題" class="gap6">
+      <input type="text" id="titleLine2" placeholder="第二行標題（選填）">
     </div>
 
-    <!-- Language -->
     <div class="sec">
-      <div class="sec-label">Language Mode</div>
-      <div class="lang-toggle">
-        <button class="lang-btn active" data-lang="zh" onclick="setLang('zh')">中文</button>
-        <button class="lang-btn" data-lang="en" onclick="setLang('en')">English</button>
-      </div>
+      <div class="sec-label">Dialogue Script</div>
+      <textarea class="dialogue-input" id="dialogueInput" placeholder="直接貼上整段對話，格式如下：
+
+A：為什麼同一件事，我總是反覆想個不停？
+B：因為你的大腦以為，只要一直想，就能解決問題。
+A：可是我好像越想越亂。
+B：因為很多時候，你其實不是在找答案。"></textarea>
+      <div class="hint">支援 A：/ B：或 A: / B: 格式，每行一句</div>
     </div>
 
-    <!-- Dialogue -->
-    <div class="sec">
-      <div class="sec-label">Dialogue — paste or type</div>
-      <div class="dialogue-list" id="dialogueList"></div>
-      <button class="add-btn" onclick="addLine()">+ Add line</button>
-    </div>
-
-    <!-- Timing -->
     <div class="sec">
       <div class="sec-label">Timing</div>
       <div class="timing-row">
-        <span class="timing-label">每字打出速度</span>
+        <span class="timing-label">每字速度</span>
         <div class="timing-right">
           <input type="range" id="charSpeed" min="30" max="150" step="10" value="70"
             oninput="document.getElementById('charSpeedVal').textContent=this.value+'ms'">
@@ -427,7 +190,7 @@ canvas {
         </div>
       </div>
       <div class="timing-row">
-        <span class="timing-label">打完後停留時間</span>
+        <span class="timing-label">顯示後停留</span>
         <div class="timing-right">
           <input type="range" id="holdTime" min="0.5" max="4" step="0.5" value="1.5"
             oninput="document.getElementById('holdTimeVal').textContent=this.value+'s'">
@@ -435,33 +198,28 @@ canvas {
         </div>
       </div>
       <div class="timing-row">
-        <span class="timing-label">字體大小</span>
+        <span class="timing-label">消失速度</span>
         <div class="timing-right">
-          <input type="range" id="fontSize" min="14" max="26" step="1" value="18"
-            oninput="document.getElementById('fontSizeVal').textContent=this.value+'px'">
-          <span class="timing-val" id="fontSizeVal">18px</span>
+          <input type="range" id="fadeTime" min="0.1" max="0.8" step="0.1" value="0.3"
+            oninput="document.getElementById('fadeTimeVal').textContent=this.value+'s'">
+          <span class="timing-val" id="fadeTimeVal">0.3s</span>
         </div>
       </div>
     </div>
 
-  </div><!-- /left-body -->
+  </div>
 
   <div class="left-footer">
     <button class="gen-btn" onclick="generate()">Generate Preview</button>
-    <button class="export-btn" id="exportBtn" onclick="exportVideo()" disabled
-      style="width:100%;padding:10px;">↓ Export Video (.webm)</button>
-    <div class="status" id="statusMsg">上傳底圖並填入對話後按 Generate</div>
+    <button class="export-btn" id="exportBtn" onclick="exportVideo()" disabled>↓ Export Video (.webm)</button>
+    <div class="status" id="statusMsg">上傳底圖並貼上對話後按 Generate</div>
   </div>
 </div>
 
-<!-- ═══ RIGHT ═══ -->
+<!-- RIGHT -->
 <div class="right">
   <div class="bg-chips" id="bgChips"></div>
-
-  <div class="canvas-wrap">
-    <canvas id="cv" width="360" height="640"></canvas>
-  </div>
-
+  <canvas id="cv" width="360" height="640"></canvas>
   <div class="playback">
     <button class="play-pause" id="playBtn" onclick="togglePlay()">
       <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -475,15 +233,34 @@ canvas {
 
 <script>
 // ══════════════════════════════════════════
-//  STATE
+// CONSTANTS — canvas is 360×640, source image is 1080×1920
+// Text zone in source: y 800–911 → scale = 360/1080 = 0.3333
+// So canvas y: 800*0.333=266.7 to 911*0.333=303.7
+// We'll place text in that band
+const SCALE = 360 / 1080;
+const TEXT_Y_TOP    = Math.round(800 * SCALE);  // 267
+const TEXT_Y_BOTTOM = Math.round(911 * SCALE);  // 304
+const TEXT_ZONE_H   = TEXT_Y_BOTTOM - TEXT_Y_TOP; // ~37px — tight, use center
+const TEXT_Y_CENTER = Math.round((TEXT_Y_TOP + TEXT_Y_BOTTOM) / 2); // ~285
+
+// A is left person, B is right person
+// Each person's head is roughly at x = 27% and 73% of canvas width (360px)
+const A_X = Math.round(360 * 0.27); // ~97
+const B_X = Math.round(360 * 0.73); // ~263
+const TEXT_MAX_W = 120; // max text width per side
+
 // ══════════════════════════════════════════
+// STATE
 const MAX_BG = 4;
-let bgs = [null, null, null, null]; // ImageBitmap or null
-let bgURLs = [null, null, null, null];
+let bgs = [null,null,null,null];
+let bgURLs = [null,null,null,null];
 let activeBg = 0;
-let lang = 'zh';
-let lineCount = 0;
-let frames = [];
+
+// Timeline events
+// Each event: { t, type, side, text, fullText }
+// type: 'type' | 'show' | 'fade-out'
+// We render by scanning timeline up to currentTime
+let timeline = []; // {startT, endT, side:'A'|'B', text:string, phase:'typing'|'hold'|'fading'|'gone'}
 let totalDur = 0;
 let currentTime = 0;
 let isPlaying = false;
@@ -494,378 +271,316 @@ const cv = document.getElementById('cv');
 const ctx = cv.getContext('2d');
 
 // ══════════════════════════════════════════
-//  BG SLOTS (left panel)
-// ══════════════════════════════════════════
+// BG MANAGEMENT
 function initBgGrid() {
   const grid = document.getElementById('bgGrid');
   grid.innerHTML = '';
-  for (let i = 0; i < MAX_BG; i++) {
+  for (let i=0;i<MAX_BG;i++) {
     const slot = document.createElement('div');
     slot.className = 'bg-slot';
     slot.dataset.idx = i;
     slot.innerHTML = `
-      <input type="file" accept="image/*" onchange="loadBg(${i}, event)">
+      <input type="file" accept="image/*" onchange="loadBg(${i},event)">
       <div class="slot-num">${i+1}</div>
       <div class="bg-slot-label">Upload</div>
-      <button class="remove-bg" onclick="removeBg(${i}, event)">×</button>
-    `;
+      <button class="remove-bg" onclick="removeBg(${i},event)">×</button>`;
     grid.appendChild(slot);
   }
-  updateBgChips();
 }
 
 function loadBg(i, e) {
-  const file = e.target.files[0];
-  if (!file) return;
+  const file = e.target.files[0]; if(!file) return;
   const url = URL.createObjectURL(file);
   const img = new Image();
   img.onload = () => {
-    bgs[i] = img;
-    bgURLs[i] = url;
+    bgs[i]=img; bgURLs[i]=url;
     const slot = document.querySelector(`.bg-slot[data-idx="${i}"]`);
-    let imgEl = slot.querySelector('img');
-    if (!imgEl) { imgEl = document.createElement('img'); slot.prepend(imgEl); }
-    imgEl.src = url;
-    slot.classList.add('filled');
-    slot.querySelector('.bg-slot-label').textContent = 'BG ' + (i+1);
-    updateBgChips();
-    if (activeBg === i || bgs[activeBg] == null) {
-      activeBg = i;
-      drawStatic();
-    }
+    let im = slot.querySelector('img');
+    if(!im){im=document.createElement('img');slot.prepend(im);}
+    im.src=url; slot.classList.add('filled');
+    slot.querySelector('.bg-slot-label').textContent='BG'+(i+1);
+    if(bgs[activeBg]==null) activeBg=i;
+    updateChips(); drawStatic();
   };
-  img.src = url;
+  img.src=url;
 }
 
-function removeBg(i, e) {
+function removeBg(i,e) {
   e.stopPropagation();
-  bgs[i] = null;
-  bgURLs[i] = null;
-  const slot = document.querySelector(`.bg-slot[data-idx="${i}"]`);
-  const imgEl = slot.querySelector('img');
-  if (imgEl) imgEl.remove();
+  bgs[i]=null; bgURLs[i]=null;
+  const slot=document.querySelector(`.bg-slot[data-idx="${i}"]`);
+  const im=slot.querySelector('img'); if(im)im.remove();
   slot.classList.remove('filled');
-  slot.querySelector('.bg-slot-label').textContent = 'Upload';
-  updateBgChips();
-  if (activeBg === i) {
-    activeBg = bgs.findIndex(b => b !== null);
-    if (activeBg < 0) activeBg = 0;
+  slot.querySelector('.bg-slot-label').textContent='Upload';
+  if(activeBg===i) activeBg=bgs.findIndex(b=>b!==null); if(activeBg<0)activeBg=0;
+  updateChips(); drawStatic();
+}
+
+function updateChips() {
+  const chips=document.getElementById('bgChips'); chips.innerHTML='';
+  bgs.forEach((bg,i)=>{
+    if(!bg)return;
+    const c=document.createElement('div');
+    c.className='bg-chip'+(i===activeBg?' active':'');
+    c.onclick=()=>{activeBg=i;updateChips();drawStatic();};
+    const im=document.createElement('img'); im.src=bgURLs[i]; c.appendChild(im);
+    chips.appendChild(c);
+  });
+}
+
+// ══════════════════════════════════════════
+// PARSE DIALOGUE
+function parseDialogue(raw) {
+  const lines = raw.split('\n');
+  const result = [];
+  for (const line of lines) {
+    const trimmed = line.trim();
+    if (!trimmed) continue;
+    // Match A: / B: / A： / B：
+    const m = trimmed.match(/^([AB])[：:]\s*(.+)$/i);
+    if (m) {
+      result.push({ side: m[1].toUpperCase(), text: m[2].trim() });
+    }
   }
-  drawStatic();
-}
-
-function updateBgChips() {
-  const chips = document.getElementById('bgChips');
-  chips.innerHTML = '';
-  bgs.forEach((bg, i) => {
-    if (!bg) return;
-    const chip = document.createElement('div');
-    chip.className = 'bg-chip' + (i === activeBg ? ' active' : '');
-    chip.onclick = () => { activeBg = i; updateBgChips(); drawStatic(); };
-    const img = document.createElement('img');
-    img.src = bgURLs[i];
-    chip.appendChild(img);
-    chips.appendChild(chip);
-  });
+  return result;
 }
 
 // ══════════════════════════════════════════
-//  LANGUAGE
-// ══════════════════════════════════════════
-function setLang(l) {
-  lang = l;
-  document.querySelectorAll('.lang-btn').forEach(b => b.classList.toggle('active', b.dataset.lang === l));
-  document.querySelectorAll('.d-line-body textarea').forEach(ta => {
-    ta.placeholder = l === 'zh' ? '中文對話...' : 'English dialogue...';
-  });
+// BUILD TIMELINE
+/*
+  Logic per side:
+  - When a new line for side X comes in:
+    - If X currently has text showing → fade it out first
+    - Then start typing new text
+    - Hold after typing done
+  - The other side's text stays until it gets a new line
+
+  We track state per side: {text, phaseStart, phase}
+*/
+function buildTimeline() {
+  const raw = document.getElementById('dialogueInput').value;
+  const lines = parseDialogue(raw);
+  if (!lines.length) return false;
+
+  const charSpeedS = parseInt(document.getElementById('charSpeed').value) / 1000;
+  const holdS      = parseFloat(document.getElementById('holdTime').value);
+  const fadeS      = parseFloat(document.getElementById('fadeTime').value);
+
+  // timeline segments: array of
+  // { side, text, typingStart, typingEnd, holdEnd, fadeEnd }
+  // We'll render each segment at render time by checking currentTime
+
+  let t = 0;
+  // Current active segment for each side
+  let active = { A: null, B: null };
+  let segments = [];
+
+  for (let i = 0; i < lines.length; i++) {
+    const { side, text } = lines[i];
+    const other = side === 'A' ? 'B' : 'A';
+
+    // If this side already has an active segment, we need to fade it out
+    if (active[side] !== null) {
+      const prev = active[side];
+      // Fade starts at t, ends at t+fadeS
+      prev.fadeStart = t;
+      prev.fadeEnd   = t + fadeS;
+      t = prev.fadeEnd;
+    }
+
+    // Type this new segment
+    const typingDur = text.length * charSpeedS;
+    const seg = {
+      side,
+      text,
+      typingStart: t,
+      typingEnd:   t + typingDur,
+      holdEnd:     t + typingDur + holdS,
+      fadeStart:   null, // set when next same-side line arrives or at very end
+      fadeEnd:     null,
+    };
+    segments.push(seg);
+    active[side] = seg;
+
+    // Advance t to after typing + hold
+    t = seg.holdEnd;
+  }
+
+  // Close remaining active segments
+  for (const side of ['A','B']) {
+    if (active[side] && active[side].fadeStart === null) {
+      active[side].fadeStart = t;
+      active[side].fadeEnd   = t + fadeS;
+    }
+  }
+  totalDur = t + fadeS + 0.3;
+
+  timeline = segments;
+  return true;
 }
 
 // ══════════════════════════════════════════
-//  DIALOGUE LINES
-// ══════════════════════════════════════════
-function addLine(speaker = 'A', text = '') {
-  lineCount++;
-  const id = 'dl_' + lineCount;
-  const list = document.getElementById('dialogueList');
-  const div = document.createElement('div');
-  div.className = 'd-line';
-  div.dataset.id = id;
-  div.dataset.speaker = speaker;
-  div.innerHTML = `
-    <div class="d-line-header">
-      <div class="sp-toggle">
-        <button class="sp-btn ${speaker==='A'?'on':''}" data-sp="A" onclick="setSp('${id}','A')">A</button>
-        <button class="sp-btn ${speaker==='B'?'on':''}" data-sp="B" onclick="setSp('${id}','B')">B</button>
-      </div>
-      <span class="d-line-num">#${lineCount}</span>
-      <button class="del-line" onclick="delLine('${id}')">×</button>
-    </div>
-    <div class="d-line-body">
-      <textarea placeholder="${lang==='zh'?'中文對話...':'English dialogue...'}">${text}</textarea>
-    </div>
-  `;
-  list.appendChild(div);
-}
-
-function setSp(id, sp) {
-  const el = document.querySelector(`.d-line[data-id="${id}"]`);
-  if (!el) return;
-  el.dataset.speaker = sp;
-  el.querySelectorAll('.sp-btn').forEach(b => b.classList.toggle('on', b.dataset.sp === sp));
-}
-
-function delLine(id) {
-  const el = document.querySelector(`.d-line[data-id="${id}"]`);
-  if (el) el.remove();
-}
-
-// ══════════════════════════════════════════
-//  CANVAS HELPERS
-// ══════════════════════════════════════════
+// RENDER
 function drawBg() {
   const bg = bgs[activeBg];
   if (bg) {
-    const ca = cv.width / cv.height;
-    const ia = bg.width / bg.height;
+    const ca=cv.width/cv.height, ia=bg.width/bg.height;
     let sx=0,sy=0,sw=bg.width,sh=bg.height;
-    if (ia > ca) { sw = bg.height*ca; sx=(bg.width-sw)/2; }
-    else         { sh = bg.width/ca;  sy=(bg.height-sh)/2; }
-    ctx.drawImage(bg, sx,sy,sw,sh, 0,0, cv.width, cv.height);
-    ctx.fillStyle='rgba(0,0,0,0.28)';
-    ctx.fillRect(0,0,cv.width,cv.height);
+    if(ia>ca){sw=bg.height*ca;sx=(bg.width-sw)/2;}
+    else{sh=bg.width/ca;sy=(bg.height-sh)/2;}
+    ctx.drawImage(bg,sx,sy,sw,sh,0,0,cv.width,cv.height);
+    ctx.fillStyle='rgba(0,0,0,0.22)';ctx.fillRect(0,0,cv.width,cv.height);
   } else {
-    ctx.fillStyle='#161616';
-    ctx.fillRect(0,0,cv.width,cv.height);
+    ctx.fillStyle='#161616';ctx.fillRect(0,0,cv.width,cv.height);
   }
 }
 
 function drawBrand() {
-  ctx.fillStyle='rgba(255,255,255,0.85)';
-  ctx.font='700 11px "Helvetica Neue",sans-serif';
+  ctx.save();
+  ctx.fillStyle='rgba(255,255,255,0.8)';
+  ctx.font='700 10px "Helvetica Neue",sans-serif';
   ctx.letterSpacing='0.22em';
   ctx.textAlign='center';
-  ctx.fillText('HUMAN SPACE', cv.width/2, 42);
+  ctx.fillText('HUMAN SPACE', cv.width/2, 36);
+  ctx.restore();
 }
 
-function drawTitle(l1, l2) {
+function drawTitle() {
+  const l1 = document.getElementById('titleLine1').value.trim();
+  const l2 = document.getElementById('titleLine2').value.trim();
   if (!l1 && !l2) return;
-  const fsize = parseInt(document.getElementById('fontSize').value);
+  ctx.save();
   ctx.textAlign='center';
-  ctx.fillStyle='rgba(255,255,255,0.92)';
-  ctx.font=`300 ${fsize}px "PingFang TC","Helvetica Neue",sans-serif`;
+  ctx.fillStyle='rgba(255,255,255,0.9)';
+  ctx.font='300 15px "PingFang TC","Helvetica Neue",sans-serif';
   ctx.letterSpacing='0.01em';
-  let y = 76;
-  if (l1) { ctx.fillText(l1, cv.width/2, y); y += fsize+8; }
-  if (l2) { ctx.fillText(l2, cv.width/2, y); }
+  let y = 58;
+  if(l1){ctx.fillText(l1,cv.width/2,y);y+=20;}
+  if(l2){ctx.fillText(l2,cv.width/2,y);}
+  ctx.restore();
 }
 
-// Wrap text for a given maxWidth, returns array of lines
-function wrapText(text, maxW, fsize) {
-  ctx.font=`300 ${fsize}px "PingFang TC","Helvetica Neue",sans-serif`;
-  const chars = [...text]; // unicode-safe
+// Wrap text into lines fitting maxW, return array of strings
+function wrapText(text, maxW, font) {
+  ctx.font = font;
+  const chars = [...text];
   const lines = [];
   let cur = '';
   for (const ch of chars) {
     const test = cur + ch;
     if (ctx.measureText(test).width > maxW && cur) {
-      lines.push(cur);
-      cur = ch;
-    } else {
-      cur = test;
-    }
+      lines.push(cur); cur = ch;
+    } else { cur = test; }
   }
   if (cur) lines.push(cur);
-  return lines;
+  return lines.length ? lines : [''];
 }
 
-// Draw a single dialogue block (cumulative)
-// speaker: 'A' | 'B', text: string (already-typed portion)
-// yBase: top y of this block
-// returns: height used
-function drawDialogueBlock(speaker, text, yBase, fsize, fullyTyped) {
-  const isA = speaker === 'A';
-  const maxW = 220;
-  const lines = wrapText(text, maxW, fsize);
-  const lh = fsize + 6;
-  const blockH = lines.length * lh;
-  const xText = isA ? 24 : cv.width - 24;
-  const align = isA ? 'left' : 'right';
+function drawSideText(side, text, alpha, showCursor) {
+  if (!text || alpha <= 0) return;
+  const isA = side === 'A';
+  const xCenter = isA ? A_X : B_X;
+  const font = '300 13px "PingFang TC","Helvetica Neue",sans-serif';
+  const maxW = TEXT_MAX_W;
+  const lh = 17;
 
-  ctx.textAlign = align;
+  const lines = wrapText(text, maxW, font);
+  const totalH = lines.length * lh;
+  // Center block vertically within text zone
+  let yStart = TEXT_Y_CENTER - totalH / 2 + lh * 0.8;
+
+  ctx.save();
+  ctx.globalAlpha = alpha;
+  ctx.fillStyle = '#ffffff';
+  ctx.font = font;
   ctx.letterSpacing = '0.01em';
+  ctx.textAlign = 'center';
 
   lines.forEach((line, i) => {
-    // alpha: fully typed lines are solid; currently-typing line fades in
-    const isLastLine = i === lines.length - 1;
-    const alpha = (!fullyTyped && isLastLine) ? 0.95 : 0.92;
-    ctx.fillStyle = `rgba(255,255,255,${alpha})`;
-    ctx.font = `300 ${fsize}px "PingFang TC","Helvetica Neue",sans-serif`;
-    ctx.fillText(line, xText, yBase + i * lh);
+    ctx.fillText(line, xCenter, yStart + i * lh);
   });
 
-  // Cursor on last line while still typing
-  if (!fullyTyped) {
-    const lastLine = lines[lines.length-1] || '';
+  // Blinking cursor on last line
+  if (showCursor) {
+    const lastLine = lines[lines.length-1];
     const lw = ctx.measureText(lastLine).width;
-    const cursorX = isA ? xText + lw + 3 : xText - lw - 3;
-    const cursorY = yBase + (lines.length-1)*lh - fsize + 2;
-    ctx.fillStyle = 'rgba(255,255,255,0.5)';
-    ctx.fillRect(cursorX - (isA?0:2), cursorY, 2, fsize);
+    const cx = xCenter + lw/2 + 3;
+    const cy = yStart + (lines.length-1)*lh - 11;
+    ctx.fillRect(cx, cy, 1.5, 13);
   }
-
-  return blockH + 10; // spacing between blocks
-}
-
-// ══════════════════════════════════════════
-//  FRAME DATA
-// ══════════════════════════════════════════
-/*
-  Each frame in `frames`:
-  {
-    startTime, duration,
-    type: 'line',
-    speaker: 'A'|'B',
-    text: full text of this line,
-    charSpeed: ms per char,
-    // cumulative: array of {speaker, text} for all PREVIOUS lines (fully shown)
-    prev: [{speaker, text}]
-  }
-*/
-function buildFrames() {
-  const entries = document.querySelectorAll('.d-line');
-  const charSpeed = parseInt(document.getElementById('charSpeed').value) / 1000; // s per char
-  const holdTime  = parseFloat(document.getElementById('holdTime').value);
-
-  frames = [];
-  totalDur = 0;
-  let prev = [];
-
-  entries.forEach(el => {
-    const ta = el.querySelector('textarea');
-    const text = (ta.value || '').trim();
-    if (!text) return;
-    const speaker = el.dataset.speaker || 'A';
-    const typeDur = text.length * charSpeed;
-    const dur = typeDur + holdTime;
-
-    frames.push({
-      startTime: totalDur,
-      duration: dur,
-      type: 'line',
-      speaker,
-      text,
-      charSpeed,
-      prev: [...prev]
-    });
-    totalDur += dur;
-    prev.push({ speaker, text });
-  });
-
-  return frames.length > 0;
-}
-
-// ══════════════════════════════════════════
-//  RENDER A MOMENT IN TIME
-// ══════════════════════════════════════════
-function renderAt(t) {
-  const fsize   = parseInt(document.getElementById('fontSize').value);
-  const title1  = document.getElementById('titleLine1').value;
-  const title2  = document.getElementById('titleLine2').value;
-
-  ctx.clearRect(0,0,cv.width,cv.height);
-  drawBg();
-  drawBrand();
-  drawTitle(title1, title2);
-
-  // Find current frame
-  let curFrame = null;
-  let elapsed = 0;
-  for (const f of frames) {
-    if (t >= f.startTime && t < f.startTime + f.duration) {
-      curFrame = f;
-      elapsed = t - f.startTime;
-      break;
-    }
-  }
-  if (!curFrame && frames.length > 0) {
-    // Past the end — show all fully
-    const last = frames[frames.length-1];
-    curFrame = last;
-    elapsed = last.duration;
-  }
-  if (!curFrame) return;
-
-  // Compute layout: stack all dialogue blocks from top of dialogue area
-  // Title area ends at roughly y=130 (adjusted for fsize)
-  const titleEndY = (title1 || title2) ? (title2 ? 110 : 90) : 68;
-  const dialogueStartY = titleEndY + 18;
-
-  // Build block list: prev lines (fully typed) + current line (partially typed)
-  const charSpeed = curFrame.charSpeed;
-  const charsTyped = Math.floor(elapsed / charSpeed);
-  const currentText = curFrame.text.substring(0, charsTyped);
-  const fullyTyped  = charsTyped >= curFrame.text.length;
-
-  const allBlocks = [
-    ...curFrame.prev.map(p => ({ speaker: p.speaker, text: p.text, full: true })),
-    { speaker: curFrame.speaker, text: currentText, full: fullyTyped }
-  ];
-
-  // Measure total height to see if we need to scroll / clip
-  const lh = fsize + 6;
-  let totalH = 0;
-  const blockHeights = allBlocks.map(b => {
-    const lines = wrapText(b.text || ' ', 220, fsize);
-    const h = lines.length * lh + 10;
-    totalH += h;
-    return h;
-  });
-
-  // If content is taller than canvas dialogue area, offset upward (scroll effect)
-  const maxH = cv.height - dialogueStartY - 40;
-  const offsetY = totalH > maxH ? totalH - maxH : 0;
-
-  // Clip to dialogue area
-  ctx.save();
-  ctx.beginPath();
-  ctx.rect(0, dialogueStartY - 4, cv.width, maxH + 8);
-  ctx.clip();
-
-  let y = dialogueStartY - offsetY;
-  allBlocks.forEach((b, i) => {
-    if (b.text) {
-      drawDialogueBlock(b.speaker, b.text, y, fsize, b.full);
-    }
-    y += blockHeights[i];
-  });
 
   ctx.restore();
 }
 
-// ══════════════════════════════════════════
-//  STATIC PLACEHOLDER
-// ══════════════════════════════════════════
+function renderAt(t) {
+  ctx.clearRect(0,0,cv.width,cv.height);
+  drawBg();
+  drawBrand();
+  drawTitle();
+
+  // For each side, find the segment active at time t
+  for (const side of ['A','B']) {
+    // Find segment that covers t
+    let seg = null;
+    for (const s of timeline) {
+      if (s.side !== side) continue;
+      // Segment is visible from typingStart to fadeEnd
+      const visStart = s.typingStart;
+      const visEnd   = s.fadeEnd !== null ? s.fadeEnd : totalDur;
+      if (t >= visStart && t <= visEnd) { seg = s; }
+    }
+    if (!seg) continue;
+
+    // Determine how much text to show and alpha
+    let displayText = '';
+    let alpha = 1;
+    let showCursor = false;
+
+    if (t < seg.typingEnd) {
+      // Typing phase
+      const charSpeedS = parseInt(document.getElementById('charSpeed').value)/1000;
+      const charsTyped = Math.floor((t - seg.typingStart) / charSpeedS);
+      displayText = seg.text.substring(0, charsTyped);
+      alpha = 1;
+      showCursor = true;
+    } else if (seg.fadeStart === null || t < seg.fadeStart) {
+      // Hold phase
+      displayText = seg.text;
+      alpha = 1;
+      showCursor = false;
+    } else if (t < seg.fadeEnd) {
+      // Fading out
+      displayText = seg.text;
+      const fadeS = parseFloat(document.getElementById('fadeTime').value);
+      alpha = 1 - (t - seg.fadeStart) / fadeS;
+      alpha = Math.max(0, Math.min(1, alpha));
+      showCursor = false;
+    } else {
+      // Gone
+      continue;
+    }
+
+    drawSideText(side, displayText, alpha, showCursor);
+  }
+}
+
 function drawStatic() {
   ctx.clearRect(0,0,cv.width,cv.height);
   drawBg();
   drawBrand();
-  const t1 = document.getElementById('titleLine1').value;
-  const t2 = document.getElementById('titleLine2').value;
-  drawTitle(t1, t2);
+  drawTitle();
   if (!bgs[activeBg]) {
-    ctx.fillStyle='#2a2a2a';
-    ctx.font='11px Helvetica';
-    ctx.textAlign='center';
-    ctx.fillText('Upload a background image', cv.width/2, cv.height/2);
+    ctx.fillStyle='#252525';ctx.font='11px Helvetica';
+    ctx.textAlign='center';ctx.letterSpacing='0';
+    ctx.fillText('Upload background image', cv.width/2, cv.height/2);
   }
 }
 
 // ══════════════════════════════════════════
-//  GENERATE
-// ══════════════════════════════════════════
+// GENERATE
 function generate() {
-  if (!buildFrames()) {
-    setStatus('請先填入對話內容');
+  if (!buildTimeline()) {
+    setStatus('請貼上對話文字（格式：A：... / B：...）');
     return;
   }
   currentTime = 0;
@@ -874,49 +589,39 @@ function generate() {
   renderAt(0);
   updatePlayUI();
   document.getElementById('exportBtn').disabled = false;
-  setStatus(`✓ ${frames.length} lines · ${totalDur.toFixed(1)}s`);
+  setStatus(`✓ ${timeline.length} lines · ${totalDur.toFixed(1)}s`);
 }
 
 // ══════════════════════════════════════════
-//  PLAYBACK
-// ══════════════════════════════════════════
+// PLAYBACK
 function togglePlay() {
-  if (!frames.length) return;
+  if (!timeline.length) return;
   isPlaying = !isPlaying;
   if (isPlaying) {
     if (currentTime >= totalDur) currentTime = 0;
     lastTS = null;
     animId = requestAnimationFrame(tick);
-  } else {
-    cancelAnimationFrame(animId);
-  }
+  } else { cancelAnimationFrame(animId); }
   updatePlayBtn();
 }
 
 function tick(ts) {
   if (!isPlaying) return;
-  if (lastTS === null) lastTS = ts;
-  currentTime += (ts - lastTS) / 1000;
-  lastTS = ts;
+  if (lastTS===null) lastTS=ts;
+  currentTime += (ts-lastTS)/1000; lastTS=ts;
   if (currentTime >= totalDur) {
-    currentTime = totalDur;
-    isPlaying = false;
-    updatePlayBtn();
-    renderAt(currentTime);
-    updatePlayUI();
-    return;
+    currentTime=totalDur; isPlaying=false;
+    updatePlayBtn(); renderAt(currentTime); updatePlayUI(); return;
   }
-  renderAt(currentTime);
-  updatePlayUI();
+  renderAt(currentTime); updatePlayUI();
   animId = requestAnimationFrame(tick);
 }
 
 function seek(e) {
-  if (!frames.length) return;
-  const r = e.currentTarget.getBoundingClientRect();
-  currentTime = ((e.clientX - r.left) / r.width) * totalDur;
-  renderAt(currentTime);
-  updatePlayUI();
+  if (!timeline.length) return;
+  const r=e.currentTarget.getBoundingClientRect();
+  currentTime=((e.clientX-r.left)/r.width)*totalDur;
+  renderAt(currentTime); updatePlayUI();
 }
 
 function updatePlayBtn() {
@@ -926,69 +631,53 @@ function updatePlayBtn() {
 }
 
 function updatePlayUI() {
-  const pct = totalDur > 0 ? (currentTime/totalDur)*100 : 0;
-  document.getElementById('trackFill').style.width = pct+'%';
-  document.getElementById('timeDisp').textContent = fmt(currentTime)+' / '+fmt(totalDur);
+  const pct = totalDur>0?(currentTime/totalDur)*100:0;
+  document.getElementById('trackFill').style.width=pct+'%';
+  document.getElementById('timeDisp').textContent=fmt(currentTime)+' / '+fmt(totalDur);
 }
 
 function fmt(s) {
-  const m = Math.floor(s/60);
+  const m=Math.floor(s/60);
   return m+':'+String(Math.floor(s%60)).padStart(2,'0');
 }
 
 // ══════════════════════════════════════════
-//  EXPORT
-// ══════════════════════════════════════════
+// EXPORT
 function exportVideo() {
-  if (!frames.length) return;
+  if (!timeline.length) return;
   setStatus('⏺ Recording…');
-  document.getElementById('exportBtn').disabled = true;
-
-  const FPS = 30;
-  const stream = cv.captureStream(FPS);
+  document.getElementById('exportBtn').disabled=true;
+  const FPS=30;
+  const stream=cv.captureStream(FPS);
   let mr;
-  try { mr = new MediaRecorder(stream, {mimeType:'video/webm;codecs=vp9'}); }
-  catch { mr = new MediaRecorder(stream); }
-
-  const chunks = [];
-  mr.ondataavailable = e => { if (e.data.size>0) chunks.push(e.data); };
-  mr.onstop = () => {
-    const blob = new Blob(chunks, {type:'video/webm'});
-    const a = document.createElement('a');
-    a.href = URL.createObjectURL(blob);
-    a.download = 'hms_dialogue_' + Date.now() + '.webm';
-    a.click();
-    setStatus('✓ Exported');
-    document.getElementById('exportBtn').disabled = false;
+  try{mr=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9'});}
+  catch{mr=new MediaRecorder(stream);}
+  const chunks=[];
+  mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
+  mr.onstop=()=>{
+    const blob=new Blob(chunks,{type:'video/webm'});
+    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
+    a.download='hms_dialogue_'+Date.now()+'.webm'; a.click();
+    setStatus('✓ Exported'); document.getElementById('exportBtn').disabled=false;
   };
-
   mr.start();
-  let t = 0;
-  function frame() {
-    if (t > totalDur + 0.5) { mr.stop(); return; }
-    renderAt(t);
-    t += 1/FPS;
-    setTimeout(frame, 1000/FPS);
+  let t=0;
+  function frame(){
+    if(t>totalDur+0.3){mr.stop();return;}
+    renderAt(t); t+=1/FPS;
+    setTimeout(frame,1000/FPS);
   }
   frame();
 }
 
-function setStatus(msg) {
-  document.getElementById('statusMsg').textContent = msg;
-}
+function setStatus(msg){document.getElementById('statusMsg').textContent=msg;}
 
 // ══════════════════════════════════════════
-//  INIT
-// ══════════════════════════════════════════
+// INIT
 initBgGrid();
-addLine('A');
-addLine('B');
-addLine('A');
 drawStatic();
-
-// Live title preview
-['titleLine1','titleLine2'].forEach(id => {
-  document.getElementById(id).addEventListener('input', drawStatic);
+['titleLine1','titleLine2'].forEach(id=>{
+  document.getElementById(id).addEventListener('input',drawStatic);
 });
 </script>
 </body>
