@@ -643,156 +643,74 @@ function fmt(s) {
 }
 
 // ══════════════════════════════════════════
-// EXPORT — background offscreen canvas, driven by real wall clock
+// EXPORT — records the preview canvas during real-time playback
 function exportVideo() {
   if (!timeline.length) return;
 
-  // Freeze preview — don't touch it during export
+  // Reset to beginning
   isPlaying = false;
   cancelAnimationFrame(animId);
+  currentTime = 0;
+  renderAt(0);
+  updatePlayUI();
   updatePlayBtn();
 
-  setStatus('⏺ Exporting… 請稍候');
+  setStatus('⏺ 錄製中，請勿切換頁面…');
   document.getElementById('exportBtn').disabled = true;
-  document.getElementById('exportBtn').textContent = '⏺ Exporting…';
+  document.getElementById('exportBtn').textContent = '⏺ Recording…';
 
   const FPS     = 30;
   const BITRATE = 2500000;
 
-  // Offscreen canvas — export renders here, preview canvas untouched
-  const oc   = document.createElement('canvas');
-  oc.width   = cv.width;
-  oc.height  = cv.height;
-  const octx = oc.getContext('2d');
-
-  // Read timing settings once
-  const charSpeedS = parseInt(document.getElementById('charSpeed').value) / 1000;
-  const fadeS      = parseFloat(document.getElementById('fadeTime').value);
-  const l1         = document.getElementById('titleLine1').value.trim();
-  const l2         = document.getElementById('titleLine2').value.trim();
-
-  function renderFrame(t) {
-    octx.clearRect(0, 0, oc.width, oc.height);
-
-    // BG
-    const bg = bgs[activeBg];
-    if (bg) {
-      const ca=oc.width/oc.height, ia=bg.width/bg.height;
-      let sx=0,sy=0,sw=bg.width,sh=bg.height;
-      if(ia>ca){sw=bg.height*ca;sx=(bg.width-sw)/2;}
-      else{sh=bg.width/ca;sy=(bg.height-sh)/2;}
-      octx.drawImage(bg,sx,sy,sw,sh,0,0,oc.width,oc.height);
-      octx.fillStyle='rgba(0,0,0,0.22)';
-      octx.fillRect(0,0,oc.width,oc.height);
-    } else {
-      octx.fillStyle='#161616';
-      octx.fillRect(0,0,oc.width,oc.height);
-    }
-
-    // Title
-    if (l1||l2) {
-      const fsize=52, lh=fsize+18;
-      const lineCount=(l1?1:0)+(l2?1:0);
-      let y=500-(lineCount*lh)/2+fsize;
-      octx.save();
-      octx.textAlign='center';
-      octx.fillStyle='#ffffff';
-      octx.font=`700 ${fsize}px "PingFang TC","Microsoft JhengHei","Noto Sans TC","Helvetica Neue",sans-serif`;
-      octx.letterSpacing='0.05em';
-      if(l1){octx.fillText(l1,oc.width/2,y);y+=lh;}
-      if(l2) octx.fillText(l2,oc.width/2,y);
-      octx.restore();
-    }
-
-    // Dialogue
-    for (const side of ['A','B']) {
-      let seg=null;
-      for (const s of timeline) {
-        if(s.side!==side) continue;
-        const visEnd=s.fadeEnd!==null?s.fadeEnd:totalDur;
-        if(t>=s.typingStart&&t<=visEnd) seg=s;
-      }
-      if(!seg) continue;
-
-      let displayText='', alpha=1, showCursor=false;
-      if(t<seg.typingEnd){
-        const n=Math.floor((t-seg.typingStart)/charSpeedS);
-        displayText=seg.text.substring(0,n);
-        showCursor=true;
-      } else if(seg.fadeStart===null||t<seg.fadeStart){
-        displayText=seg.text;
-      } else if(t<seg.fadeEnd){
-        displayText=seg.text;
-        alpha=Math.max(0,1-(t-seg.fadeStart)/fadeS);
-      } else continue;
-      if(!displayText) continue;
-
-      const xCenter=side==='A'?A_X:B_X;
-      const font='400 42px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif';
-      const lh=60;
-      octx.font=font;
-      const wlines=[];
-      let cur='';
-      for(const ch of [...displayText]){
-        const test=cur+ch;
-        if(octx.measureText(test).width>TEXT_MAX_W&&cur){wlines.push(cur);cur=ch;}
-        else cur=test;
-      }
-      if(cur)wlines.push(cur);
-      if(!wlines.length)wlines.push('');
-      const yStart=TEXT_Y_CENTER-(wlines.length*lh)/2+lh*0.8;
-      octx.save();
-      octx.globalAlpha=alpha;
-      octx.fillStyle='#ffffff';
-      octx.font=font;
-      octx.letterSpacing='0.02em';
-      octx.textAlign='center';
-      wlines.forEach((line,i)=>octx.fillText(line,xCenter,yStart+i*lh));
-      if(showCursor){
-        const lw=octx.measureText(wlines[wlines.length-1]).width;
-        octx.fillRect(xCenter+lw/2+6,yStart+(wlines.length-1)*lh-34,4,40);
-      }
-      octx.restore();
-    }
-  }
-
-  // Set up MediaRecorder
-  const stream=oc.captureStream(FPS);
+  // Record the PREVIEW canvas directly — what you see is what gets recorded
+  const stream = cv.captureStream(FPS);
   let mr;
-  try{mr=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9',videoBitsPerSecond:BITRATE});}
-  catch{try{mr=new MediaRecorder(stream,{videoBitsPerSecond:BITRATE});}catch{mr=new MediaRecorder(stream);}}
+  try { mr = new MediaRecorder(stream, { mimeType:'video/webm;codecs=vp9', videoBitsPerSecond:BITRATE }); }
+  catch { try { mr = new MediaRecorder(stream, { videoBitsPerSecond:BITRATE }); } catch { mr = new MediaRecorder(stream); } }
 
-  const chunks=[];
-  mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-  mr.onstop=()=>{
-    const blob=new Blob(chunks,{type:'video/webm'});
-    const a=document.createElement('a');
-    a.href=URL.createObjectURL(blob);
-    a.download='hms_dialogue_'+Date.now()+'.webm';
+  const chunks = [];
+  mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  mr.onstop = () => {
+    const blob = new Blob(chunks, { type:'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hms_dialogue_' + Date.now() + '.webm';
     a.click();
     setStatus('✓ 匯出完成');
-    document.getElementById('exportBtn').disabled=false;
-    document.getElementById('exportBtn').textContent='↓ Export Video (.webm)';
+    document.getElementById('exportBtn').disabled = false;
+    document.getElementById('exportBtn').textContent = '↓ Export Video (.webm)';
   };
 
   mr.start();
 
-  // Drive frames by REAL wall clock — guarantees export speed = preview speed
-  const startWall = performance.now();
-  const totalMs   = (totalDur + 0.8) * 1000;
+  // Play through using the exact same tick() loop as preview
+  // When playback ends naturally, stop recording
+  const origTick = isPlaying;
+  isPlaying = true;
+  lastTS = null;
 
-  function tick() {
-    const elapsed = performance.now() - startWall;
-    if (elapsed >= totalMs) {
-      renderFrame(totalDur);
+  function recordTick(ts) {
+    if (!isPlaying) return;
+    if (lastTS === null) lastTS = ts;
+    currentTime += (ts - lastTS) / 1000;
+    lastTS = ts;
+
+    if (currentTime >= totalDur + 0.5) {
+      isPlaying = false;
+      updatePlayBtn();
+      renderAt(totalDur);
+      updatePlayUI();
       mr.stop();
       return;
     }
-    renderFrame(elapsed / 1000);
-    requestAnimationFrame(tick);
+
+    renderAt(currentTime);
+    updatePlayUI();
+    animId = requestAnimationFrame(recordTick);
   }
 
-  requestAnimationFrame(tick);
+  updatePlayBtn();
+  animId = requestAnimationFrame(recordTick);
 }
 
 function setStatus(msg){document.getElementById('statusMsg').textContent=msg;}
