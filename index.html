@@ -184,9 +184,9 @@ B：因為很多時候，你其實不是在找答案。"></textarea>
       <div class="timing-row">
         <span class="timing-label">每字速度</span>
         <div class="timing-right">
-          <input type="range" id="charSpeed" min="30" max="300" step="10" value="120"
+          <input type="range" id="charSpeed" min="50" max="400" step="10" value="150"
             oninput="document.getElementById('charSpeedVal').textContent=this.value+'ms'">
-          <span class="timing-val" id="charSpeedVal">120ms</span>
+          <span class="timing-val" id="charSpeedVal">150ms</span>
         </div>
       </div>
       <div class="timing-row">
@@ -458,14 +458,26 @@ function drawTitle() {
 // Wrap text into lines fitting maxW, return array of strings
 function wrapText(text, maxW, font) {
   ctx.font = font;
-  const chars = [...text];
+  // Detect CJK vs English
+  const cjkCount = (text.match(/[\u4e00-\u9fff\u3400-\u4dbf]/g) || []).length;
+  const isCJK = cjkCount > text.length * 0.3;
   const lines = [];
   let cur = '';
-  for (const ch of chars) {
-    const test = cur + ch;
-    if (ctx.measureText(test).width > maxW && cur) {
-      lines.push(cur); cur = ch;
-    } else { cur = test; }
+
+  if (isCJK) {
+    // Character-by-character for Chinese
+    for (const ch of [...text]) {
+      const test = cur + ch;
+      if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = ch; }
+      else cur = test;
+    }
+  } else {
+    // Word-by-word for English
+    for (const word of text.split(' ')) {
+      const test = cur ? cur + ' ' + word : word;
+      if (ctx.measureText(test).width > maxW && cur) { lines.push(cur); cur = word; }
+      else cur = test;
+    }
   }
   if (cur) lines.push(cur);
   return lines.length ? lines : [''];
