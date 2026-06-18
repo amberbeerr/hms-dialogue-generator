@@ -448,7 +448,7 @@ function drawTitle() {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffffff';
-  ctx.font = `400 ${fsize}px "PingFang TC","Microsoft JhengHei","Noto Sans TC","Helvetica Neue",sans-serif`;
+  ctx.font = `700 ${fsize}px "PingFang TC","Microsoft JhengHei","Noto Sans TC","Helvetica Neue",sans-serif`;
   ctx.letterSpacing = '0.05em';
   if (l1) { ctx.fillText(l1, cv.width/2, y); y += lh; }
   if (l2) { ctx.fillText(l2, cv.width/2, y); }
@@ -475,7 +475,7 @@ function drawSideText(side, text, alpha, showCursor) {
   if (!text || alpha <= 0) return;
   const isA = side === 'A';
   const xCenter = isA ? A_X : B_X;
-  const font = '700 42px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif';
+  const font = '400 42px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif';
   const maxW = TEXT_MAX_W;
   const lh = 60;
 
@@ -646,29 +646,66 @@ function fmt(s) {
 // EXPORT
 function exportVideo() {
   if (!timeline.length) return;
-  setStatus('⏺ Recording…');
-  document.getElementById('exportBtn').disabled=true;
-  const FPS=30;
-  const stream=cv.captureStream(FPS);
+
+  // Stop preview playback first
+  isPlaying = false;
+  cancelAnimationFrame(animId);
+  updatePlayBtn();
+
+  setStatus('⏺ Exporting… 請勿切換頁面');
+  document.getElementById('exportBtn').disabled = true;
+  document.getElementById('exportBtn').textContent = '⏺ Exporting…';
+
+  const FPS = 30;
+  const BITRATE = 2500000; // 2.5 Mbps — good quality, small file
+  const stream = cv.captureStream(FPS);
+
   let mr;
-  try{mr=new MediaRecorder(stream,{mimeType:'video/webm;codecs=vp9'});}
-  catch{mr=new MediaRecorder(stream);}
-  const chunks=[];
-  mr.ondataavailable=e=>{if(e.data.size>0)chunks.push(e.data);};
-  mr.onstop=()=>{
-    const blob=new Blob(chunks,{type:'video/webm'});
-    const a=document.createElement('a'); a.href=URL.createObjectURL(blob);
-    a.download='hms_dialogue_'+Date.now()+'.webm'; a.click();
-    setStatus('✓ Exported'); document.getElementById('exportBtn').disabled=false;
-  };
-  mr.start();
-  let t=0;
-  function frame(){
-    if(t>totalDur+0.3){mr.stop();return;}
-    renderAt(t); t+=1/FPS;
-    setTimeout(frame,1000/FPS);
+  try {
+    mr = new MediaRecorder(stream, {
+      mimeType: 'video/webm;codecs=vp9',
+      videoBitsPerSecond: BITRATE
+    });
+  } catch {
+    try {
+      mr = new MediaRecorder(stream, { videoBitsPerSecond: BITRATE });
+    } catch {
+      mr = new MediaRecorder(stream);
+    }
   }
-  frame();
+
+  const chunks = [];
+  mr.ondataavailable = e => { if (e.data.size > 0) chunks.push(e.data); };
+  mr.onstop = () => {
+    const blob = new Blob(chunks, { type: 'video/webm' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'hms_dialogue_' + Date.now() + '.webm';
+    a.click();
+    setStatus('✓ 匯出完成');
+    document.getElementById('exportBtn').disabled = false;
+    document.getElementById('exportBtn').textContent = '↓ Export Video (.webm)';
+  };
+
+  mr.start();
+
+  // Precise frame-by-frame rendering — no setTimeout drift
+  const totalFrames = Math.ceil((totalDur + 0.5) * FPS);
+  let frameIndex = 0;
+
+  function renderNextFrame() {
+    if (frameIndex > totalFrames) {
+      mr.stop();
+      return;
+    }
+    const t = frameIndex / FPS;
+    renderAt(t);
+    frameIndex++;
+    // Use requestAnimationFrame for smooth precise cadence
+    requestAnimationFrame(renderNextFrame);
+  }
+
+  renderNextFrame();
 }
 
 function setStatus(msg){document.getElementById('statusMsg').textContent=msg;}
