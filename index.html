@@ -448,9 +448,8 @@ function drawTitle() {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffffff';
-  // 明體粗體
-  ctx.font = `700 ${fsize}px "Songti SC","Georgia","Times New Roman",serif`;
-  ctx.letterSpacing = '0.02em';
+  ctx.font = `400 ${fsize}px "PingFang TC","Microsoft JhengHei","Noto Sans TC","Helvetica Neue",sans-serif`;
+  ctx.letterSpacing = '0.05em';
   if (l1) { ctx.fillText(l1, cv.width/2, y); y += lh; }
   if (l2) { ctx.fillText(l2, cv.width/2, y); }
   ctx.restore();
@@ -576,13 +575,22 @@ function generate() {
     setStatus('請貼上對話文字（格式：A：... / B：...）');
     return;
   }
-  currentTime = 0;
+  // Stop any existing playback
   isPlaying = false;
+  cancelAnimationFrame(animId);
+
+  currentTime = 0;
   updatePlayBtn();
   renderAt(0);
   updatePlayUI();
   document.getElementById('exportBtn').disabled = false;
-  setStatus(`✓ ${timeline.length} lines · ${totalDur.toFixed(1)}s`);
+  setStatus(`✓ ${timeline.length} lines · ${totalDur.toFixed(1)}s — 按 ▶ 預覽`);
+
+  // Auto-start playback
+  isPlaying = true;
+  lastTS = null;
+  updatePlayBtn();
+  animId = requestAnimationFrame(tick);
 }
 
 // ══════════════════════════════════════════
