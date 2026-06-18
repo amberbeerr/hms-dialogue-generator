@@ -95,11 +95,11 @@ input[type=range] { width:90px;background:none;border:none;padding:0;accent-colo
 }
 .gen-btn:hover { background:#fff; }
 .export-btn {
-  width:100%;padding:9px;background:none;border:1px solid #1e1e1e;border-radius:2px;
-  color:#444;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;
+  width:100%;padding:9px;background:#1a1a1a;border:1px solid #555;border-radius:2px;
+  color:#bbb;font-size:9px;letter-spacing:0.15em;text-transform:uppercase;
   cursor:pointer;font-family:inherit;transition:all 0.2s;
 }
-.export-btn:hover:not(:disabled) { border-color:#444;color:#888; }
+.export-btn:hover:not(:disabled) { border-color:#aaa;color:#fff;background:#252525; }
 .export-btn:disabled { opacity:0.3;cursor:not-allowed; }
 .status { font-size:10px;color:#3a3a3a;letter-spacing:0.04em;text-align:center;min-height:13px; }
 
@@ -219,7 +219,7 @@ B：因為很多時候，你其實不是在找答案。"></textarea>
 <!-- RIGHT -->
 <div class="right">
   <div class="bg-chips" id="bgChips"></div>
-  <canvas id="cv" width="360" height="640"></canvas>
+  <canvas id="cv" width="1080" height="1920" style="width:360px;height:640px;"></canvas>
   <div class="playback">
     <button class="play-pause" id="playBtn" onclick="togglePlay()">
       <svg id="playIcon" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
@@ -233,21 +233,18 @@ B：因為很多時候，你其實不是在找答案。"></textarea>
 
 <script>
 // ══════════════════════════════════════════
-// CONSTANTS — canvas is 360×640, source image is 1080×1920
-// Text zone in source: y 800–911 → scale = 360/1080 = 0.3333
-// So canvas y: 800*0.333=266.7 to 911*0.333=303.7
-// We'll place text in that band
-const SCALE = 360 / 1080;
-const TEXT_Y_TOP    = Math.round(800 * SCALE);  // 267
-const TEXT_Y_BOTTOM = Math.round(911 * SCALE);  // 304
-const TEXT_ZONE_H   = TEXT_Y_BOTTOM - TEXT_Y_TOP; // ~37px — tight, use center
-const TEXT_Y_CENTER = Math.round((TEXT_Y_TOP + TEXT_Y_BOTTOM) / 2); // ~285
+// CONSTANTS — canvas IS 1080×1920 (native resolution)
+// All coordinates are in source image pixels directly
+const SCALE = 1; // canvas = source image size, no scaling needed
+const TEXT_Y_TOP    = 800;
+const TEXT_Y_BOTTOM = 911;
+const TEXT_Y_CENTER = Math.round((TEXT_Y_TOP + TEXT_Y_BOTTOM) / 2); // 855
 
 // A is left person, B is right person
-// Each person's head is roughly at x = 27% and 73% of canvas width (360px)
-const A_X = Math.round(360 * 0.27); // ~97
-const B_X = Math.round(360 * 0.73); // ~263
-const TEXT_MAX_W = 120; // max text width per side
+// x positions as % of 1080px canvas
+const A_X = Math.round(1080 * 0.27); // ~292
+const B_X = Math.round(1080 * 0.73); // ~788
+const TEXT_MAX_W = 402; // max text width per side (~one extra character)
 
 // ══════════════════════════════════════════
 // STATE
@@ -440,14 +437,10 @@ function drawTitle() {
   const l2 = document.getElementById('titleLine2').value.trim();
   if (!l1 && !l2) return;
 
-  // Source image 1080×1920, title zone y400–600 → canvas scale 360/1080
-  // y400*scale=133, y600*scale=200 → center=167
-  const TITLE_TOP    = Math.round(400 * SCALE); // 133
-  const TITLE_BOTTOM = Math.round(600 * SCALE); // 200
-  const TITLE_CENTER = Math.round((TITLE_TOP + TITLE_BOTTOM) / 2); // 167
-
-  const fsize = 16;
-  const lh = fsize + 6;
+  // Native 1080×1920 coords — title zone y400–600, center=500
+  const TITLE_CENTER = 500;
+  const fsize = 52; // ~3x dialogue font for prominence
+  const lh = fsize + 18;
   const lineCount = (l1 ? 1 : 0) + (l2 ? 1 : 0);
   const totalH = lineCount * lh;
   let y = TITLE_CENTER - totalH / 2 + fsize;
@@ -455,8 +448,8 @@ function drawTitle() {
   ctx.save();
   ctx.textAlign = 'center';
   ctx.fillStyle = '#ffffff';
-  // Bold black font for clarity
-  ctx.font = `600 ${fsize}px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif`;
+  // 明體粗體
+  ctx.font = `700 ${fsize}px "Songti SC","Georgia","Times New Roman",serif`;
   ctx.letterSpacing = '0.02em';
   if (l1) { ctx.fillText(l1, cv.width/2, y); y += lh; }
   if (l2) { ctx.fillText(l2, cv.width/2, y); }
@@ -483,13 +476,12 @@ function drawSideText(side, text, alpha, showCursor) {
   if (!text || alpha <= 0) return;
   const isA = side === 'A';
   const xCenter = isA ? A_X : B_X;
-  const font = '700 14px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif';
+  const font = '700 42px "PingFang TC","Microsoft JhengHei","Helvetica Neue",sans-serif';
   const maxW = TEXT_MAX_W;
-  const lh = 20;
+  const lh = 60;
 
   const lines = wrapText(text, maxW, font);
   const totalH = lines.length * lh;
-  // Center block vertically within text zone
   let yStart = TEXT_Y_CENTER - totalH / 2 + lh * 0.8;
 
   ctx.save();
@@ -503,13 +495,13 @@ function drawSideText(side, text, alpha, showCursor) {
     ctx.fillText(line, xCenter, yStart + i * lh);
   });
 
-  // Blinking cursor on last line
+  // Cursor
   if (showCursor) {
     const lastLine = lines[lines.length-1];
     const lw = ctx.measureText(lastLine).width;
-    const cx = xCenter + lw/2 + 3;
-    const cy = yStart + (lines.length-1)*lh - 11;
-    ctx.fillRect(cx, cy, 1.5, 13);
+    const cx = xCenter + lw/2 + 6;
+    const cy = yStart + (lines.length-1)*lh - 34;
+    ctx.fillRect(cx, cy, 4, 40);
   }
 
   ctx.restore();
